@@ -80,7 +80,7 @@ static const NSUInteger MAXIMUM_NUMBER_OF_TOUCHES = 2;
 //            }
         } else {
             // cancel movement if constraint check was not passed
-            self.state = UIGestureRecognizerStateCancelled;
+            self.state = UIGestureRecognizerStateFailed;
         }
     }
 }

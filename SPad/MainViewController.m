@@ -12,8 +12,10 @@
 #import "ModeManager.h"
 #import "ShapePasteboard.h"
 #import "SelectionLineView.h"
+//#import "SelectionAreaView.h"
 #import "ZoomManager.h"
 #import "GuidelineManager.h"
+#import "Geometry.h"
 
 @interface MainViewController () <UIScrollViewDelegate>
 
@@ -21,6 +23,7 @@
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) IBOutlet CanvasView *canvas;
 @property (strong, nonatomic) SelectionLineView *selectionLineView;
+//@property (strong, nonatomic) SelectionAreaView *selectionAreaView;
 
 @property (strong, nonatomic) NSArray *canvasGestureRecognizers;
 @property (strong, nonatomic) NSArray *scrollviewGestureRecognizers;
@@ -109,14 +112,23 @@
     [self.canvas addGestureRecognizer:pasteGestureRecognizer];
     // selection line gesture recognizer
     UIPanGestureRecognizer *selectionLineGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handleSelectionLineGesture:)];
+    selectionLineGestureRecognizer.maximumNumberOfTouches = 1;
+    selectionLineGestureRecognizer.minimumNumberOfTouches = 1;
     selectionLineGestureRecognizer.enabled = NO;
     [self.canvas addGestureRecognizer:selectionLineGestureRecognizer];
+//    // selection area gesture recognizer
+//    UIPanGestureRecognizer *selectionAreaGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handleSelectionAreaGesture:)];
+//    selectionAreaGestureRecognizer.maximumNumberOfTouches = 2;
+//    selectionAreaGestureRecognizer.minimumNumberOfTouches = 2;
+//    selectionLineGestureRecognizer.enabled = NO;
+//    [self.canvas addGestureRecognizer:selectionAreaGestureRecognizer];
     NSMutableArray *canvasGestureRecognizers = [[NSMutableArray alloc] initWithCapacity:N_MODES];
     for (NSUInteger i = 0; i < N_MODES; i++) {
         [canvasGestureRecognizers addObject:[[NSMutableArray alloc] init]];
     }
     NSMutableArray *gestureRecognizersForCopyMode = [canvasGestureRecognizers objectAtIndex:ModeCopy];
     [gestureRecognizersForCopyMode addObject:selectionLineGestureRecognizer];
+//    [gestureRecognizersForCopyMode addObject:selectionAreaGestureRecognizer];
     NSMutableArray *gestureRecognizersForPasteMode = [canvasGestureRecognizers objectAtIndex:ModePaste];
     [gestureRecognizersForPasteMode addObject:pasteGestureRecognizer];
     _canvasGestureRecognizers = (NSArray *) canvasGestureRecognizers;
@@ -219,6 +231,46 @@
             break;
     }
 }
+
+//- (void)handleSelectionAreaGesture:(UIPanGestureRecognizer *)gestureRecognizer {
+//    switch (gestureRecognizer.state) {
+//        case UIGestureRecognizerStateBegan: {
+//            if ([gestureRecognizer numberOfTouches] < 2) {
+//                return;
+//            }
+//            CGPoint a = [gestureRecognizer locationOfTouch:0 inView:gestureRecognizer.view];
+//            CGPoint b = [gestureRecognizer locationOfTouch:1 inView:gestureRecognizer.view];
+//            self.selectionAreaView = [[SelectionAreaView alloc] initWithFrame:CGRectZero];
+//            [self.selectionAreaView startSelectionAreaWithPoints:a :b];
+//            [self.canvas addSubview:self.selectionAreaView];
+//            [self.selectionAreaView initConstraints];
+//            break;
+//        }
+//            
+//        case UIGestureRecognizerStateChanged: {
+//            if ([gestureRecognizer numberOfTouches] < 2) {
+//                return;
+//            }
+//            CGPoint a = [gestureRecognizer locationOfTouch:0 inView:gestureRecognizer.view];
+//            CGPoint b = [gestureRecognizer locationOfTouch:1 inView:gestureRecognizer.view];
+//            [self.selectionAreaView updateSelectionAreaWithPoints:a :b];
+////            [self checkIntersectionsWithSegment:self.lastSelectionLinePoint :newLinePoint];
+//            [self.selectionAreaView setNeedsDisplay];
+//            break;
+//        }
+//            
+//        case UIGestureRecognizerStateEnded:
+//        case UIGestureRecognizerStateCancelled:
+//        case UIGestureRecognizerStateFailed: {
+////            [self.shapesIntersected removeAllObjects];
+//            [self.selectionAreaView removeFromSuperview];
+//            self.selectionAreaView = nil;
+//            break;
+//        }
+//        default:
+//            break;
+//    }
+//}
 
 - (void)checkIntersectionsWithSegment:(CGPoint)p1 :(CGPoint)p2 {
     for (ShapeView *shape in self.canvas.shapeSubviews) {

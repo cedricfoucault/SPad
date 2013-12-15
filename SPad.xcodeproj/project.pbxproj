@@ -53,6 +53,8 @@
 		82706F1718553C1F006CAFB3 /* HorizontalGuideline.m in Sources */ = {isa = PBXBuildFile; fileRef = 82706F1418553C1E006CAFB3 /* HorizontalGuideline.m */; };
 		82706F1818553C1F006CAFB3 /* VerticalGuideline.m in Sources */ = {isa = PBXBuildFile; fileRef = 82706F1618553C1E006CAFB3 /* VerticalGuideline.m */; };
 		82706F1B1855437B006CAFB3 /* GuidelineManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 82706F1A1855437B006CAFB3 /* GuidelineManager.m */; };
+		827B107F185AFDBA00FD4891 /* Geometry.m in Sources */ = {isa = PBXBuildFile; fileRef = 827B107E185AFDBA00FD4891 /* Geometry.m */; };
+		827B1082185B002900FD4891 /* SelectionAreaView.m in Sources */ = {isa = PBXBuildFile; fileRef = 827B1081185B002900FD4891 /* SelectionAreaView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -140,6 +142,10 @@
 		82706F1618553C1E006CAFB3 /* VerticalGuideline.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VerticalGuideline.m; sourceTree = "<group>"; };
 		82706F191855437B006CAFB3 /* GuidelineManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GuidelineManager.h; sourceTree = "<group>"; };
 		82706F1A1855437B006CAFB3 /* GuidelineManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GuidelineManager.m; sourceTree = "<group>"; };
+		827B107D185AFD6C00FD4891 /* Geometry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Geometry.h; sourceTree = "<group>"; };
+		827B107E185AFDBA00FD4891 /* Geometry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Geometry.m; sourceTree = "<group>"; };
+		827B1080185B002900FD4891 /* SelectionAreaView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SelectionAreaView.h; sourceTree = "<group>"; };
+		827B1081185B002900FD4891 /* SelectionAreaView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SelectionAreaView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -217,6 +223,8 @@
 				82706F0818551931006CAFB3 /* CanvasView.m */,
 				82706F0918551931006CAFB3 /* SelectionLineView.h */,
 				82706F0A18551931006CAFB3 /* SelectionLineView.m */,
+				827B1080185B002900FD4891 /* SelectionAreaView.h */,
+				827B1081185B002900FD4891 /* SelectionAreaView.m */,
 				82706F01185518AE006CAFB3 /* ShapeView.h */,
 				82706F02185518AE006CAFB3 /* ShapeView.m */,
 				82706EFB18551828006CAFB3 /* SelectionManager.h */,
@@ -245,6 +253,8 @@
 				82706F0518551914006CAFB3 /* TouchDownGestureRecognizer.m */,
 				82706F1018553237006CAFB3 /* ConstrainedPanGestureRecognizer.h */,
 				82706F1118553237006CAFB3 /* ConstrainedPanGestureRecognizer.m */,
+				827B107D185AFD6C00FD4891 /* Geometry.h */,
+				827B107E185AFDBA00FD4891 /* Geometry.m */,
 				82706EBD18551290006CAFB3 /* UIView+LayoutConstraints.h */,
 				82706EBE18551290006CAFB3 /* UIView+LayoutConstraints.m */,
 				82706EBF18551290006CAFB3 /* UIDevice+Hardware.h */,
@@ -407,6 +417,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				827B1082185B002900FD4891 /* SelectionAreaView.m in Sources */,
 				82706F1818553C1F006CAFB3 /* VerticalGuideline.m in Sources */,
 				82706ECB18551290006CAFB3 /* DiagonalSwipeRecognizer.m in Sources */,
 				82706EC318551290006CAFB3 /* AppDelegate.m in Sources */,
@@ -427,6 +438,7 @@
 				82706F1218553237006CAFB3 /* ConstrainedPanGestureRecognizer.m in Sources */,
 				82706F1B1855437B006CAFB3 /* GuidelineManager.m in Sources */,
 				82706EC518551290006CAFB3 /* SPadContainerViewController.m in Sources */,
+				827B107F185AFDBA00FD4891 /* Geometry.m in Sources */,
 				82706F0B18551931006CAFB3 /* CanvasView.m in Sources */,
 				82706EC618551290006CAFB3 /* MainViewController.m in Sources */,
 				82706ECF18551290006CAFB3 /* UIDevice+Hardware.m in Sources */,
@@ -635,6 +647,7 @@
 				82706EA418551266006CAFB3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		82706EA518551266006CAFB3 /* Build configuration list for PBXNativeTarget "SPadTests" */ = {
 			isa = XCConfigurationList;
@@ -643,6 +656,7 @@
 				82706EA718551266006CAFB3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

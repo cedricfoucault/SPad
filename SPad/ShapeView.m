@@ -12,6 +12,7 @@
 #import "TouchDownGestureRecognizer.h"
 #import "ConstrainedPanGestureRecognizer.h"
 #import "GuidelineManager.h"
+#import "Geometry.h"
 
 @interface ShapeView ()
 
@@ -73,10 +74,16 @@
         [gestureRecognizersForMoveMode addObject:move2FingersGestureRecognizer];
         // init transform gesture recognizers
         NSMutableArray *gestureRecognizersForTransformMode = [gestureRecognizers objectAtIndex:ModeTransform];
-        UIPinchGestureRecognizer *transformPinchGestureRecgonizer = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handleTransformPinch:)];
-        transformPinchGestureRecgonizer.enabled = NO;
-        [self addGestureRecognizer:transformPinchGestureRecgonizer];
-        [gestureRecognizersForTransformMode addObject:transformPinchGestureRecgonizer];
+        UIPinchGestureRecognizer *transformPinchGestureRecognizer = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handleTransformPinch:)];
+        transformPinchGestureRecognizer.enabled = NO;
+        [self addGestureRecognizer:transformPinchGestureRecognizer];
+        [gestureRecognizersForTransformMode addObject:transformPinchGestureRecognizer];
+        ConstrainedPanGestureRecognizer *transform2FingersGestureRecognizer = [[ConstrainedPanGestureRecognizer alloc] initWithTarget:self action:@selector(handleTransform2Fingers:)];
+        transform2FingersGestureRecognizer.maximumNumberOfTouches = 2;
+        transform2FingersGestureRecognizer.minimumNumberOfTouches = 2;
+        transform2FingersGestureRecognizer.enabled = NO;
+        [self addGestureRecognizer:transform2FingersGestureRecognizer];
+        [gestureRecognizersForTransformMode addObject:transform2FingersGestureRecognizer];
         
         // keep all gesture recognizers in property
         _customGestureRecognizers = (NSArray *)gestureRecognizers;
@@ -165,10 +172,16 @@
 }
 
 - (void)handleMove1Finger:(UIPanGestureRecognizer *)sender {
-    if (sender.state == UIGestureRecognizerStateChanged) {
+     if (sender.state == UIGestureRecognizerStateChanged) {
         CGPoint translation = [sender translationInView:sender.view];
         [self translateX:translation.x Y:translation.y];
         [sender setTranslation:CGPointZero inView:sender.view];
+     } else if (sender.state == UIGestureRecognizerStateBegan) {
+         // change transparency
+         self.alpha = 0.5;
+     } else if (sender.state == UIGestureRecognizerStateEnded || sender.state == UIGestureRecognizerStateCancelled) {
+         // reset transparency
+         self.alpha = 1;
     }
 }
 
@@ -179,18 +192,86 @@
         if (sender.direction == ConstrainedPanGestureRecognizerDirectionHorizontal) {
             [self translateX:translation.x Y:0];
             // show alignment guideline
-            [guidelineManager.horizontalGuideline moveCenterY:(self.bounds.origin.y + self.heightConstraint.constant / 2) inView:sender.view];
-            guidelineManager.horizontalGuideline.hidden = NO;
+//            if (guidelineManager.horizontalGuideline.isHidden) {
+//                [guidelineManager.horizontalGuideline moveCenterY:(self.bounds.origin.y + self.heightConstraint.constant / 2) inView:sender.view];
+//                guidelineManager.horizontalGuideline.hidden = NO;
+//            }
         } else if (sender.direction == ConstrainedPanGestureRecognizerDirectionVertical) {
-            //            NSLog(@"VERTICAL translation: %f %f", translation.x, translation.y);
             [self translateX:0 Y:translation.y];
             // show alignment guideline
-            [guidelineManager.verticalGuideline moveCenterX:(self.bounds.origin.x + self.widthConstraint.constant / 2) inView:sender.view];
-            guidelineManager.verticalGuideline.hidden = NO;
+//            if (guidelineManager.verticalGuideline.isHidden) {
+//                [guidelineManager.verticalGuideline moveCenterX:(self.bounds.origin.x + self.widthConstraint.constant / 2) inView:sender.view];
+//                guidelineManager.verticalGuideline.hidden = NO;
+//            }
         }
         [sender setTranslation:CGPointZero inView:sender.view];
+    } else if (sender.state == UIGestureRecognizerStateBegan) {
+        // change transparency
+        self.alpha = 0.7;
+        // possibly show alignment guideline
+        if (sender.direction == ConstrainedPanGestureRecognizerDirectionHorizontal) {
+            // show alignment guideline
+            if (guidelineManager.horizontalGuideline.isHidden) {
+                [guidelineManager.horizontalGuideline moveCenterY:(self.bounds.origin.y + self.heightConstraint.constant / 2) inView:sender.view];
+                guidelineManager.horizontalGuideline.hidden = NO;
+            }
+        } else if (sender.direction == ConstrainedPanGestureRecognizerDirectionVertical) {
+            // show alignment guideline
+            if (guidelineManager.verticalGuideline.isHidden) {
+                [guidelineManager.verticalGuideline moveCenterX:(self.bounds.origin.x + self.widthConstraint.constant / 2) inView:sender.view];
+                guidelineManager.verticalGuideline.hidden = NO;
+            }
+        }
     } else if (sender.state == UIGestureRecognizerStateEnded || sender.state == UIGestureRecognizerStateCancelled) {
+        // reset transparency
+        self.alpha = 1;
         // hide alignment guideline
+        guidelineManager.horizontalGuideline.hidden = YES;
+        guidelineManager.verticalGuideline.hidden = YES;
+    }
+}
+
+- (void)handleTransform2Fingers:(ConstrainedPanGestureRecognizer *)sender {
+    GuidelineManager *guidelineManager = [GuidelineManager sharedManager];
+    if (sender.state == UIGestureRecognizerStateChanged) {
+        CGPoint location = [sender locationInView:sender.view];
+        CGPoint translation = [sender translationInView:sender.view];
+        if (sender.direction == ConstrainedPanGestureRecognizerDirectionHorizontal) {
+            if (location.x < self.widthConstraint.constant / 2) {
+                [self translateLeftEdgeX:translation.x];
+            } else {
+                [self translateRightEdgeX:translation.x];
+            }
+        } else if (sender.direction == ConstrainedPanGestureRecognizerDirectionVertical) {
+            if (location.y < self.heightConstraint.constant / 2) {
+                [self translateTopEdgeY:translation.y];
+            } else {
+                [self translateBottomEdgeY:translation.y];
+            }
+        }
+        [self setNeedsDisplay];
+        [sender setTranslation:CGPointZero inView:sender.view];
+    } else if (sender.state == UIGestureRecognizerStateBegan) {
+        // change transparency
+        self.alpha = 0.7;
+        // show alignment guidelines
+        if (sender.direction == ConstrainedPanGestureRecognizerDirectionHorizontal) {
+            // show alignment guideline
+            if (guidelineManager.horizontalGuideline.isHidden) {
+                [guidelineManager.horizontalGuideline moveCenterY:(self.bounds.origin.y + self.heightConstraint.constant / 2) inView:sender.view];
+                guidelineManager.horizontalGuideline.hidden = NO;
+            }
+        } else if (sender.direction == ConstrainedPanGestureRecognizerDirectionVertical) {
+            // show alignment guideline
+            if (guidelineManager.verticalGuideline.isHidden) {
+                [guidelineManager.verticalGuideline moveCenterX:(self.bounds.origin.x + self.widthConstraint.constant / 2) inView:sender.view];
+                guidelineManager.verticalGuideline.hidden = NO;
+            }
+        }
+    } else if (sender.state == UIGestureRecognizerStateEnded || sender.state == UIGestureRecognizerStateCancelled) {
+        // reset transparency
+        self.alpha = 1;
+        // hide alignment guidelines
         guidelineManager.horizontalGuideline.hidden = YES;
         guidelineManager.verticalGuideline.hidden = YES;
     }
@@ -202,12 +283,17 @@
         [self scale:sender.scale];
         sender.scale = 1;
         [self setNeedsDisplay];
+    } else if (sender.state == UIGestureRecognizerStateBegan) {
+        // change transparency
+        self.alpha = 0.7;
         // show alignment guidelines
         [guidelineManager.horizontalGuideline moveCenterY:(self.bounds.origin.x + self.heightConstraint.constant / 2) inView:sender.view];
         guidelineManager.horizontalGuideline.hidden = NO;
         [guidelineManager.verticalGuideline moveCenterX:(self.bounds.origin.y + self.widthConstraint.constant / 2) inView:sender.view];
         guidelineManager.verticalGuideline.hidden = NO;
     } else if (sender.state == UIGestureRecognizerStateEnded || sender.state == UIGestureRecognizerStateCancelled) {
+        // reset transparency
+        self.alpha = 1;
         // hide alignment guidelines
         guidelineManager.horizontalGuideline.hidden = YES;
         guidelineManager.verticalGuideline.hidden = YES;
@@ -222,6 +308,24 @@
     size.height *= scale;
     [self resize:size];
     [self translateX:(deltaX / 2) Y:(deltaY / 2)];
+}
+
+- (void)translateLeftEdgeX:(CGFloat)x {
+    self.leftConstraint.constant += x;
+    self.widthConstraint.constant -= x;
+}
+
+- (void)translateRightEdgeX:(CGFloat)x {
+    self.widthConstraint.constant += x;
+}
+
+- (void)translateTopEdgeY:(CGFloat)y {
+    self.topConstraint.constant += y;
+    self.heightConstraint.constant -= y;
+}
+
+- (void)translateBottomEdgeY:(CGFloat)y {
+    self.heightConstraint.constant += y;
 }
 
 
@@ -273,10 +377,14 @@
     CGPoint topRight = CGPointMake(container.origin.x + container.size.width, container.origin.y);
     CGPoint bottomLeft = CGPointMake(container.origin.x, container.origin.y + container.size.height);
     CGPoint bottomRight = CGPointMake(container.origin.x + container.size.width, container.origin.y + container.size.height);
-    return ([self checkLineIntersection:p1 :p2 :topLeft :topRight] ||
-            [self checkLineIntersection:p1 :p2 :topLeft :bottomLeft] ||
-            [self checkLineIntersection:p1 :p2 :bottomLeft :bottomRight] ||
-            [self checkLineIntersection:p1 :p2 :topRight :bottomRight]);
+    return (LineSegmentsIntersect(p1, p2, topLeft, topRight) ||
+            LineSegmentsIntersect(p1, p2, topLeft, bottomLeft) ||
+            LineSegmentsIntersect(p1, p2, bottomLeft, bottomRight) ||
+            LineSegmentsIntersect(p1, p2, topRight, bottomRight));
+//    return ([self checkLineIntersection:p1 :p2 :topLeft :topRight] ||
+//            [self checkLineIntersection:p1 :p2 :topLeft :bottomLeft] ||
+//            [self checkLineIntersection:p1 :p2 :bottomLeft :bottomRight] ||
+//            [self checkLineIntersection:p1 :p2 :topRight :bottomRight]);
 }
 
 -(BOOL)checkLineIntersection:(CGPoint)p1 :(CGPoint)p2 :(CGPoint)p3 :(CGPoint)p4 {
